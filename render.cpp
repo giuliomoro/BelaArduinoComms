@@ -24,7 +24,6 @@ The Bela software is distributed under the GNU Lesser General Public License
 
 #include <Bela.h>
 #include <cmath>
-#include <rtdk.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -123,9 +122,9 @@ int initSerial(const char *portname, int speed)
     return 0;
 }
 
-void readSerialPort() 
+void readSerialPort(void* arg)
 {
-    int rdlen;
+	int rdlen;
 	rdlen = read(_handle, serialBuffer, SERIAL_BUFFER_SIZE);
 	if (rdlen > 0) {
 		azimuth = (float)serialBuffer[rdlen-1];
@@ -145,7 +144,7 @@ bool setup(BelaContext *context, void *userData)
     phase = 0.0f;
     
     initSerial("/dev/ttyACM0", B9600);
-    ttyTask = Bela_createAuxiliaryTask(readSerialPort, 50, "bela-arduino-comms");
+    ttyTask = Bela_createAuxiliaryTask(readSerialPort, 50, "bela-arduino-comms", NULL);
 	return true;
 }
 
@@ -175,3 +174,4 @@ void cleanup(BelaContext *context, void *userData)
 {
     close(_handle);
 }
+
